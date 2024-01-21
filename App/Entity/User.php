@@ -1,23 +1,13 @@
 <?php /** @noinspection MethodShouldBeFinalInspection */
 declare( strict_types=1 );
-/*
- * Copyright © 2018-2024, Nations Original Sp. z o.o. <contact@nations-original.com>
- *
- * Permission to use, copy, modify, and/or distribute this software for any purpose with or without fee is hereby
- * granted, provided that the above copyright notice and this permission notice appear in all copies.
- *
- * THE SOFTWARE IS PROVIDED \"AS IS\" AND THE AUTHOR DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS SOFTWARE
- * INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE
- * LIABLE FOR ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER
- * RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER
- * TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
- */
 
 namespace App\Entity;
 
 use App\DoctrineLifecycleCallbacks\UserPreRemoveCallback;
 use App\Enums\UserGroupEnum;
 use App\Repository\UserRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Events;
 use Doctrine\ORM\Mapping as ORM;
 use PHP_SF\Framework\Http\Middleware\auth;
@@ -58,12 +48,16 @@ class User extends AbstractEntity implements UserInterface
     #[ORM\JoinColumn( name: 'user_group_id', nullable: false, columnDefinition: 'INT NOT NULL DEFAULT 6' )]
     protected int|UserGroup $userGroup;
 
+    #[ORM\OneToMany(mappedBy: 'user', targetEntity: Client::class, orphanRemoval: true)]
+    private Collection $clients;
+
     # endregion
 
 
     public function __construct()
     {
         $this->setCreatedAt( new DateTime );
+        $this->clients = new ArrayCollection();
     }
 
 
@@ -138,6 +132,36 @@ class User extends AbstractEntity implements UserInterface
         return [
             Events::postRemove => UserPreRemoveCallback::class,
         ];
+    }
+
+    /**
+     * @return Collection<int, Client>
+     */
+    public function getClients(): Collection
+    {
+        return $this->clients;
+    }
+
+    public function addClient(Client $client): static
+    {
+        if (!$this->clients->contains($client)) {
+            $this->clients->add($client);
+            $client->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeClient(Client $client): static
+    {
+        if ($this->clients->removeElement($client)) {
+            // set the owning side to null (unless already changed)
+            if ($client->getUser() === $this) {
+                $client->setUser(null);
+            }
+        }
+
+        return $this;
     }
 
 }
