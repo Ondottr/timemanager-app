@@ -64,9 +64,9 @@ final class ClientsController extends AbstractController
     }
 
     #[Route(url: '/client/new', httpMethod: Request::METHOD_POST, middleware: [auth::class])]
-    public function client_new(Request $request): RedirectResponse
+    public function client_new(): RedirectResponse
     {
-        $name = htmlspecialchars(trim($request->get('name', '')));
+        $name = htmlspecialchars(trim($this->request->get('name', '')));
 
         if (empty($name)) {
             throw new InvalidArgumentException('Name is required');

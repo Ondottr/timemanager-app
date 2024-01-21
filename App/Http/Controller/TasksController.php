@@ -56,15 +56,15 @@ final class TasksController extends AbstractController
     }
 
     #[Route(url: '/task/new', httpMethod: Request::METHOD_POST, middleware: [auth::class])]
-    public function task_new(Request $request): RedirectResponse
+    public function task_new(): RedirectResponse
     {
-        $name = htmlspecialchars(trim($request->get('name', '')));
+        $name = htmlspecialchars(trim($this->request->get('name', '')));
 
         if (empty($name)) {
             throw new InvalidArgumentException('Name is required');
         }
 
-        $project = Project::find($request->get('project_id'));
+        $project = Project::find($this->request->get('project_id'));
 
         if ($project === null) {
             throw new InvalidArgumentException('Project not found');

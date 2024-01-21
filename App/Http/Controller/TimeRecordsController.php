@@ -29,9 +29,9 @@ final class TimeRecordsController extends AbstractController
     }
 
     #[Route(url: '/time_record/new', httpMethod: Request::METHOD_POST, middleware: [auth::class])]
-    public function time_record_new(Request $request): RedirectResponse
+    public function time_record_new(): RedirectResponse
     {
-        $task = Task::find($request->get('task_id'));
+        $task = Task::find($this->request->get('task_id'));
 
         if ($task === null) {
             throw new InvalidArgumentException('Task not found');

@@ -56,15 +56,15 @@ final class ProjectsController extends AbstractController
     }
 
     #[Route(url: '/project/new', httpMethod: Request::METHOD_POST, middleware: [auth::class])]
-    public function project_new(Request $request): RedirectResponse
+    public function project_new(): RedirectResponse
     {
-        $name = htmlspecialchars(trim($request->get('name', '')));
+        $name = htmlspecialchars(trim($this->request->get('name', '')));
 
         if (empty($name)) {
             throw new InvalidArgumentException('Name is required');
         }
 
-        $client = Client::find($request->get('user_id'));
+        $client = Client::find($this->request->get('user_id'));
 
         if ($client === null) {
             throw new InvalidArgumentException('Client not found');

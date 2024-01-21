@@ -26,7 +26,7 @@ class Project extends AbstractEntity
     #[ORM\Column(length: 255)]
     protected ?string $name = null;
 
-    #[TranslatablePropertyName('isActive')]
+    #[TranslatablePropertyName('Is active')]
     #[ORM\Column(name: 'is_active', type: 'boolean', options: ['default' => true])]
     protected bool $isActive = true;
 

@@ -27,7 +27,7 @@ class Task extends AbstractEntity
     #[ORM\Column(length: 255)]
     protected ?string $name = null;
 
-    #[TranslatablePropertyName('isCompleted')]
+    #[TranslatablePropertyName('Is completed')]
     #[ORM\Column(name: 'is_completed', type: Types::BOOLEAN, options: ['default' => false])]
     protected bool $completed = false;
 
@@ -36,6 +36,7 @@ class Task extends AbstractEntity
     #[ORM\ManyToOne(inversedBy: 'tasks')]
     #[ORM\JoinColumn(name: 'project_id', nullable: false)]
     protected ?Project $project = null;
+
 
     #[ORM\OneToMany(mappedBy: 'taks', targetEntity: TimeRecord::class, orphanRemoval: true)]
     private Collection $timeRecords;
@@ -84,6 +85,7 @@ class Task extends AbstractEntity
 
         return $this;
     }
+
 
     /**
      * @return Collection<int, TimeRecord>

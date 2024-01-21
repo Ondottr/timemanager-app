@@ -1,4 +1,5 @@
-<?php
+<?php /** @noinspection MethodShouldBeFinalInspection */
+declare(strict_types=1);
 
 namespace App\Entity;
 
@@ -13,6 +14,8 @@ use PHP_SF\System\Classes\Abstracts\AbstractEntity;
 use PHP_SF\System\Core\DateTime;
 
 #[ORM\Entity(repositoryClass: TimeRecordRepository::class)]
+#[ORM\Table(name: 'time_records')]
+#[ORM\Cache(usage: 'READ_WRITE')]
 class TimeRecord extends AbstractEntity
 {
 
@@ -28,6 +31,10 @@ class TimeRecord extends AbstractEntity
 
     #[ORM\Column(nullable: true)]
     protected ?DateInterval $interval = null;
+
+    #[TranslatablePropertyName('Is paused')]
+    #[ORM\Column(name: 'is_paused', type: 'boolean', options: ['default' => false])]
+    protected bool $isPaused = false;
 
 
     #[TranslatablePropertyName('Task')]
@@ -74,6 +81,18 @@ class TimeRecord extends AbstractEntity
     public function setInterval(?DateInterval $interval): static
     {
         $this->interval = $interval;
+
+        return $this;
+    }
+
+    public function isPaused(): bool
+    {
+        return $this->isPaused;
+    }
+
+    public function setIsPaused(bool $isPaused): static
+    {
+        $this->isPaused = $isPaused;
 
         return $this;
     }
