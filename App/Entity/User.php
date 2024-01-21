@@ -106,7 +106,7 @@ class User extends AbstractEntity implements UserInterface
         return $this->password;
     }
 
-    public function setPassword( #[SensitiveParameter] string|null $password ): self
+    public function setPassword( #[\SensitiveParameter] string|null $password ): self
     {
         $this->password = password_hash( $password, PASSWORD_ARGON2I );
 

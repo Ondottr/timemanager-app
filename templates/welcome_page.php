@@ -8,6 +8,7 @@
 
 namespace App\View;
 
+use App\Entity\User;
 use PHP_SF\System\Classes\Abstracts\AbstractView;
 
 // @formatter:off
@@ -94,7 +95,7 @@ final class welcome_page extends AbstractView { public function show(): void { ?
                 <h1>
                   <small>Welcome to</small>
                   PHP_SF <span class="version"><?= env( 'DEVELOPMENT_STAGE' ) ?></span>
-                  <small style="font-size: 50%;">(Based on Symfony)</small>
+                  <small style="font-size: 50%;">(Based on Symfony 7)</small>
                 </h1>
             </div>
 
