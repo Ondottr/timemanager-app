@@ -78,9 +78,21 @@ final class ClientsController extends AbstractController
 
         em()->persist($client);
 
-        return $this->redirectTo('client_page', ['clientId' => $client->getId()]);
+        return $this->redirectTo('client_page', get: ['clientId' => $client->getId()], messages: ['Client created']);
     }
 
-    // TODO:: delete endpoint
+    #[Route(url: '/clients/{$clientId}/delete', httpMethod: Request::METHOD_POST, middleware: [auth::class])]
+    public function client_delete(int $clientId): RedirectResponse
+    {
+        $client = Client::find($clientId);
+
+        if ($client === null) {
+            throw new NotFoundHttpException("Client with id $clientId not found");
+        }
+
+        em()->remove($client);
+
+        return $this->redirectTo('clients_list_page', messages: ['Client deleted']);
+    }
 
 }
