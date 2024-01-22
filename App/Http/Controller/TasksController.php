@@ -23,25 +23,25 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 final class TasksController extends AbstractController
 {
 
-    #[Route(url: '/tasks/{$taskId}', httpMethod: Request::METHOD_GET, middleware: [auth::class])]
+    #[Route(url: '/task/{$taskId}', httpMethod: Request::METHOD_GET, middleware: [auth::class])]
     public function task_page(int $taskId): Response
     {
         $task = Task::find($taskId);
 
         if ($task === null) {
-            throw new NotFoundHttpException("Task with id $taskId not found");
+            throw new NotFoundHttpException(_t('Task with id %s not found', $taskId));
         }
 
         return $this->render(task_page::class, compact('task'));
     }
 
-    #[Route(url: '/tasks/{taskId}/time_records', httpMethod: Request::METHOD_GET, middleware: [auth::class])]
+    #[Route(url: '/task/{taskId}/time_records', httpMethod: Request::METHOD_GET, middleware: [auth::class])]
     public function task_time_records_list_page(int $taskId): Response
     {
         $task = Task::find($taskId);
 
         if ($task === null) {
-            throw new NotFoundHttpException("Task with id $taskId not found");
+            throw new NotFoundHttpException(_t('Task with id %s not found', $taskId));
         }
 
         $timeRecords = $task->getTimeRecords();
@@ -61,13 +61,13 @@ final class TasksController extends AbstractController
         $name = htmlspecialchars(trim($this->request->get('name', '')));
 
         if (empty($name)) {
-            throw new InvalidArgumentException('Name is required');
+            throw new InvalidArgumentException(_t('Name is required'));
         }
 
         $project = Project::find($this->request->get('project_id'));
 
         if ($project === null) {
-            throw new InvalidArgumentException('Project not found');
+            throw new InvalidArgumentException(_t('Project not found'));
         }
 
         $task = (new Task())
@@ -79,6 +79,23 @@ final class TasksController extends AbstractController
         return $this->redirectTo('task_page', ['taskId' => $task->getId()]);
     }
 
-    // TODO:: delete endpoint
+    #[Route(url: '/task/{$taskId}/delete', httpMethod: Request::METHOD_POST, middleware: [auth::class])]
+    public function task_delete(int $taskId): RedirectResponse
+    {
+        $task = Task::find($taskId);
+
+        if ($task === null) {
+            throw new NotFoundHttpException(_t('Task with id %s not found', $taskId));
+        }
+
+        $projectId = $task->getProject()->getId();
+
+        em()->remove($task);
+
+        return $this->redirectTo('project_tasks_list_page',
+            get: compact('projectId'),
+            messages: [_t('Task deleted')]
+        );
+    }
 
 }

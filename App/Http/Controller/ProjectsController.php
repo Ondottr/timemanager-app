@@ -23,25 +23,25 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 final class ProjectsController extends AbstractController
 {
 
-    #[Route(url: '/projects/{$projectId}', httpMethod: Request::METHOD_GET, middleware: [auth::class])]
+    #[Route(url: '/project/{$projectId}', httpMethod: Request::METHOD_GET, middleware: [auth::class])]
     public function project_page(int $projectId): Response
     {
         $project = Project::find($projectId);
 
         if ($project === null) {
-            throw new NotFoundHttpException("Project with id $projectId not found");
+            throw new NotFoundHttpException(_t('Project with id %s not found', $projectId));
         }
 
         return $this->render(project_page::class, compact('project'));
     }
 
-    #[Route(url: '/projects/{projectId}/tasks', httpMethod: Request::METHOD_GET, middleware: [auth::class])]
+    #[Route(url: '/project/{$projectId}/tasks', httpMethod: Request::METHOD_GET, middleware: [auth::class])]
     public function project_tasks_list_page(int $projectId): Response
     {
         $project = Project::find($projectId);
 
         if ($project === null) {
-            throw new NotFoundHttpException("Project with id $projectId not found");
+            throw new NotFoundHttpException(_t('Project with id %s not found', $projectId));
         }
 
         $tasks = $project->getTasks();
@@ -61,13 +61,13 @@ final class ProjectsController extends AbstractController
         $name = htmlspecialchars(trim($this->request->get('name', '')));
 
         if (empty($name)) {
-            throw new InvalidArgumentException('Name is required');
+            throw new InvalidArgumentException(_t('Name is required'));
         }
 
         $client = Client::find($this->request->get('user_id'));
 
         if ($client === null) {
-            throw new InvalidArgumentException('Client not found');
+            throw new InvalidArgumentException(_t('Client not found'));
         }
 
         $project = (new Project())
@@ -79,6 +79,18 @@ final class ProjectsController extends AbstractController
         return $this->redirectTo('project_page', ['projectId' => $project->getId()]);
     }
 
-    // TODO:: delete endpoint
+    #[Route(url: '/project/{$projectId}/delete', httpMethod: Request::METHOD_POST, middleware: [auth::class])]
+    public function project_delete(int $projectId): RedirectResponse
+    {
+        $project = Project::find($projectId);
+
+        if ($project === null) {
+            throw new NotFoundHttpException(_t('Project with id %s not found', $projectId));
+        }
+
+        em()->remove($project);
+
+        return $this->redirectTo('clients_list_page', messages: [_t('Project deleted')]);
+    }
 
 }

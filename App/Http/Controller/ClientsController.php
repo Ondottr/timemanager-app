@@ -37,7 +37,7 @@ final class ClientsController extends AbstractController
         $client = Client::find($clientId);
 
         if ($client === null) {
-            throw new NotFoundHttpException("Client with id $clientId not found");
+            throw new NotFoundHttpException(_t('Client with id %s not found', $clientId));
         }
 
         return $this->render(client_page::class, compact('client'));
@@ -49,7 +49,7 @@ final class ClientsController extends AbstractController
         $client = Client::find($clientId);
 
         if ($client === null) {
-            throw new NotFoundHttpException("Client with id $clientId not found");
+            throw new NotFoundHttpException(_t('Client with id %s not found', $clientId));
         }
 
         $projects = $client->getProjects();
@@ -69,7 +69,7 @@ final class ClientsController extends AbstractController
         $name = htmlspecialchars(trim($this->request->get('name', '')));
 
         if (empty($name)) {
-            throw new InvalidArgumentException('Name is required');
+            throw new InvalidArgumentException(_t('Name is required'));
         }
 
         $client = (new Client())
@@ -78,7 +78,7 @@ final class ClientsController extends AbstractController
 
         em()->persist($client);
 
-        return $this->redirectTo('client_page', get: ['clientId' => $client->getId()], messages: ['Client created']);
+        return $this->redirectTo('client_page', get: ['clientId' => $client->getId()], messages: [_t('Client created')]);
     }
 
     #[Route(url: '/clients/{$clientId}/delete', httpMethod: Request::METHOD_POST, middleware: [auth::class])]
@@ -87,12 +87,12 @@ final class ClientsController extends AbstractController
         $client = Client::find($clientId);
 
         if ($client === null) {
-            throw new NotFoundHttpException("Client with id $clientId not found");
+            throw new NotFoundHttpException(_t('Client with id %s not found', $clientId));
         }
 
         em()->remove($client);
 
-        return $this->redirectTo('clients_list_page', messages: ['Client deleted']);
+        return $this->redirectTo('clients_list_page', messages: [_t('Client deleted')]);
     }
 
 }

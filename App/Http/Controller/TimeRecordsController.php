@@ -12,6 +12,7 @@ use PHP_SF\System\Classes\Abstracts\AbstractController;
 use PHP_SF\System\Core\RedirectResponse;
 use PHP_SF\System\Core\Response;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
  * Class TimeRecordsController
@@ -34,7 +35,7 @@ final class TimeRecordsController extends AbstractController
         $task = Task::find($this->request->get('task_id'));
 
         if ($task === null) {
-            throw new InvalidArgumentException('Task not found');
+            throw new InvalidArgumentException(_t('Task not found'));
         }
 
         $timeRecord = (new TimeRecord())
@@ -45,6 +46,23 @@ final class TimeRecordsController extends AbstractController
         return $this->redirectTo('time_record_page', ['timeRecordId' => $timeRecord->getId()]);
     }
 
-    // TODO:: delete endpoint
+    #[Route(url: '/time_record/{$timeRecordId}/delete', httpMethod: Request::METHOD_POST, middleware: [auth::class])]
+    public function time_record_delete(int $timeRecordId): RedirectResponse
+    {
+        $timeRecord = TimeRecord::find($timeRecordId);
+
+        if ($timeRecord === null) {
+            throw new NotFoundHttpException(_t('Time record with id %s not found', $timeRecordId));
+        }
+
+        $taskId = $timeRecord->getTask()->getId();
+
+        em()->remove($timeRecord);
+
+        return $this->redirectTo('task_time_records_list_page',
+            get: compact('taskId'),
+            messages: [_t('Time record deleted')]
+        );
+    }
 
 }
